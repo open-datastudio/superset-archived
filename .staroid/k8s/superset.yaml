@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: superset
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: superset
+  template:
+    metadata:
+      labels:
+        app: superset
+    spec:
+      initContainers:
+      - name: superset-init
+        image: superset
+        command: [ "bash", "-c" ]
+        args:
+        - >-
+            echo "Step 1. Setting up admin user" &&
+            superset fab create-admin --username admin --firstname Superset --lastname Admin --email admin@superset.com --password admin &&
+            echo "Step 2. Applying DB migrations" &&
+            superset db upgrade &&
+            echo "Step 3. Loading examplese" &&
+            superset load_examples &&
+            echo "Step 4. Settting up roles and perms" &&
+            superset init
+        envFrom:
+          - configMapRef:
+              name: env
+      containers:
+      - name: superset
+        image: superset
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "512Mi"
+          limits:
+            cpu: "4"
+            memory: "2048Mi"
+        envFrom:
+        - configMapRef:
+            name: env
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: superset
+spec:
+  ports:
+  - port: 8088
+  selector:
+    app: superset

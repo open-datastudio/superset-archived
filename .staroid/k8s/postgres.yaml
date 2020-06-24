@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        pod.staroid.com/isolation: dedicated
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999 # fyi, 'sandboxed' does not support fsGroup
+      containers:
+      - name: postgres
+        image: postgres:12.3
+        env:
+        - name: POSTGRES_USER
+          value: superset
+        - name: POSTGRES_PASSWORD
+          value: superset
+        - name: POSTGRES_DB
+          value: superset
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+          - name: db-volume
+            mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: db-volume
+          persistentVolumeClaim:
+            claimName: db-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc
+spec:
+  storageClassName: ssd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: db
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: postgres
