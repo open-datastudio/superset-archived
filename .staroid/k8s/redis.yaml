@@ -14,7 +14,6 @@ spec:
     spec:
       securityContext:
         runAsUser: 999
-        fsGroup: 999 # fyi, 'sandboxed' does not support fsGroup
       containers:
       - name: redis
         image: redis:3.2
@@ -23,7 +22,7 @@ spec:
             cpu: "100m"
             memory: "512Mi"
           limits:
-            cpu: "2"
+            cpu: "1"
             memory: "512Mi"
 ---
 kind: Service
