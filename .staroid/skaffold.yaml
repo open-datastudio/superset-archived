@@ -1,0 +1,25 @@
+apiVersion: skaffold/v2beta1
+kind: Config
+build:
+  artifacts:
+    - image: superset
+      context: .
+      docker:
+        dockerfile: Dockerfile 
+        buildArgs:
+          NPM_BUILD_CMD: build
+  local:
+    concurrency: 2
+deploy:
+  kubectl:
+    manifests:
+      - .staroid/k8s/env.yaml
+      - .staroid/k8s/redis.yaml
+      - .staroid/k8s/postgres.yaml
+      - .staroid/k8s/superset.yaml
+profiles:
+  - name: minikube
+    patches:
+      - op: add
+        path: /deploy/kubectl/manifests/0
+        value: .staroid/k8s/minikube.yaml

@@ -1,0 +1,7 @@
+apiVersion: beta/v1
+build:
+  skaffold: {}
+ingress:
+  - serviceName: superset
+    port: 8088
+deploy: {}
