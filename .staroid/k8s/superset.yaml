@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: superset-config
+data:
+  superset_config.py: |
+    SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -31,6 +39,12 @@ spec:
         envFrom:
           - configMapRef:
               name: env
+        env:
+        - name: SUPERSET_CONFIG_PATH
+          value: /superset-config/superset_config.py
+        volumeMounts:
+        - name: config-volume
+          mountPath: /superset-config
       containers:
       - name: superset
         image: superset
@@ -44,6 +58,16 @@ spec:
         envFrom:
         - configMapRef:
             name: env
+        env:
+        - name: SUPERSET_CONFIG_PATH
+          value: /superset-config/superset_config.py
+        volumeMounts:
+        - name: config-volume
+          mountPath: /superset-config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: superset-config
 ---
 kind: Service
 apiVersion: v1
