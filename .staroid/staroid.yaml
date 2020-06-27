@@ -1,6 +1,7 @@
 apiVersion: beta/v1
 build:
-  skaffold: {}
+  skaffold:
+    file: .staroid/skaffold.yaml
 ingress:
   - serviceName: superset
     port: 8088
