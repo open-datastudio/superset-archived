@@ -12,6 +12,8 @@ spec:
       labels:
         app: superset
     spec:
+      securityContext:
+        runAsUser: 1000
       initContainers:
       - name: superset-init
         image: superset
