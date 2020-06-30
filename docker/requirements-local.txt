@@ -9,7 +9,6 @@ sqlalchemy-redshift
 pydruid
 pyhive
 pybigquery
-elasticsearch-dbap
 cockroachdb
 gsheetsdb
 mysqlclient
