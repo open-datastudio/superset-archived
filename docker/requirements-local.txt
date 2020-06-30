@@ -1,0 +1,19 @@
+# includes python dependencies for .staroid.
+# reason this file is requirements-local and not in .staroid/ directory is
+# that .staroid/ uses /Dockerfile without modification,
+# and Dockerfile adds requirements-local.txt and run pip install on this.
+
+PyAthenaJDBC>1.0.9
+PyAthena>1.2.0
+sqlalchemy-redshift
+pydruid
+pyhive
+pybigquery
+elasticsearch-dbap
+cockroachdb
+gsheetsdb
+mysqlclient
+psycopg2
+cx_Oracle
+snowflake-sqlalchemy
+pymssql
