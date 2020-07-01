@@ -7,7 +7,11 @@ PyAthenaJDBC>1.0.9
 PyAthena>1.2.0
 sqlalchemy-redshift
 pydruid
+
+sasl
+thrift_sasl
 pyhive
+
 pybigquery
 cockroachdb
 gsheetsdb
