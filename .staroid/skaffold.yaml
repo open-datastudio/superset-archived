@@ -5,7 +5,7 @@ build:
     - image: superset
       context: .
       docker:
-        dockerfile: Dockerfile 
+        dockerfile: .staroid/Dockerfile_generated
         buildArgs:
           NPM_BUILD_CMD: build
   local:

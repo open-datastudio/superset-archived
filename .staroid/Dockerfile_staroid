@@ -1,0 +1,16 @@
+FROM dev AS staroid
+
+COPY .staroid/requirements-staroid.txt /app/
+
+USER root
+
+# install libsasl2-dev for pip thrift
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+         libsasl2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cd /app \
+    && pip install --ignore-installed -r requirements-staroid.txt
+
+USER superset
