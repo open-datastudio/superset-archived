@@ -8,6 +8,7 @@ data:
 
     # to allow iframe embedding. https://github.com/apache/incubator-superset/issues/8382
     SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_HTTPONLY = False
 ---
 apiVersion: apps/v1
 kind: Deployment
