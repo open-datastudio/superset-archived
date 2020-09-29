@@ -5,6 +5,9 @@ metadata:
 data:
   superset_config.py: |
     SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
+
+    # to allow iframe embedding. https://github.com/apache/incubator-superset/issues/8382
+    SESSION_COOKIE_SAMESITE = 'None'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42,6 +45,8 @@ spec:
         env:
         - name: SUPERSET_CONFIG_PATH
           value: /superset-config/superset_config.py
+        - name: IFRAME_MODE
+          value: "False"
         volumeMounts:
         - name: config-volume
           mountPath: /superset-config
@@ -61,6 +66,8 @@ spec:
         env:
         - name: SUPERSET_CONFIG_PATH
           value: /superset-config/superset_config.py
+        - name: IFRAME_MODE
+          value: "False"
         volumeMounts:
         - name: config-volume
           mountPath: /superset-config
