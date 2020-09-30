@@ -12,6 +12,9 @@ data:
 
     # Use all X-Forwarded headers when ENABLE_PROXY_FIX is True.
     ENABLE_PROXY_FIX = True
+
+    # CSRF
+    WTF_CSRF_ENABLED = False
 ---
 apiVersion: apps/v1
 kind: Deployment
