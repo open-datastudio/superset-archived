@@ -4,17 +4,22 @@ metadata:
   name: superset-config
 data:
   superset_config.py: |
+    import os
+
     SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
 
-    # to allow iframe embedding. https://github.com/apache/incubator-superset/issues/8382
-    SESSION_COOKIE_SAMESITE = None
-    SESSION_COOKIE_HTTPONLY = False
+    if os.environ["ALLOW_IFRAME"] == "True":
+      # to allow iframe embedding. https://github.com/apache/incubator-superset/issues/8382
+      SESSION_COOKIE_SAMESITE = None
+      SESSION_COOKIE_HTTPONLY = False
 
-    # Use all X-Forwarded headers when ENABLE_PROXY_FIX is True.
-    ENABLE_PROXY_FIX = True
+      # Use all X-Forwarded headers when ENABLE_PROXY_FIX is True.
+      ENABLE_PROXY_FIX = True
 
-    # CSRF
-    WTF_CSRF_ENABLED = False
+      # CSRF
+      WTF_CSRF_ENABLED = False
+
+      HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -52,6 +57,8 @@ spec:
         env:
         - name: SUPERSET_CONFIG_PATH
           value: /superset-config/superset_config.py
+        - name: ALLOW_IFRAME
+          value: "False"
         volumeMounts:
         - name: config-volume
           mountPath: /superset-config
@@ -71,6 +78,8 @@ spec:
         env:
         - name: SUPERSET_CONFIG_PATH
           value: /superset-config/superset_config.py
+        - name: ALLOW_IFRAME
+          value: "False"
         volumeMounts:
         - name: config-volume
           mountPath: /superset-config

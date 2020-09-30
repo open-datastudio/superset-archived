@@ -5,4 +5,20 @@ build:
 ingress:
   - serviceName: superset
     port: 8088
-deploy: {}
+deploy:
+  paramGroups:
+  - name: Configuration
+    collapsed: true
+    params:
+    - name: Iframe mode
+      description: Set 'True' to embed superset in iframe from different domain. This option will disable CSRF.
+      type: STRING
+      defaultValue: "False"
+      options:
+        - name: "True"
+          value: "True"
+        - name: "False"
+          value: "False"
+      paths:
+      - Deployment:superset:spec.template.spec.initContainers[0].env[1].value # IFRAME_MODE
+      - Deployment:superset:spec.template.spec.containers[0].env[1].value # IFRAME_MODE
