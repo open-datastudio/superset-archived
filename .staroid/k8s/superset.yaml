@@ -20,6 +20,9 @@ data:
       WTF_CSRF_ENABLED = False
 
       HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
+
+      # prevent redirect from https to http
+      SUPERSET_WEBSERVER_PROTOCOL = "https"
 ---
 apiVersion: apps/v1
 kind: Deployment
