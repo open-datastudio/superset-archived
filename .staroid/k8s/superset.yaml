@@ -8,6 +8,24 @@ data:
 
     SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
 
+    # https://github.com/komoot/superset-reverse-nginx-example/blob/master/superset_config.py
+    class ReverseProxied(object):
+      """
+      Because we are reverse proxied from an aws load balancer
+      use environ/config to signal https
+      since flask ignores preferred_url_scheme in url_for calls
+      """
+        def __init__(self, app):
+          self.app = app
+
+        def __call__(self, environ, start_response):
+          # if one of x_forwarded or preferred_url is https, prefer it.
+          forwarded_scheme = environ.get("HTTP_X_FORWARDED_PROTO", None)
+          preferred_scheme = app.config.get("PREFERRED_URL_SCHEME", None)
+          if "https" in [forwarded_scheme, preferred_scheme]:
+            environ["wsgi.url_scheme"] = "https"
+          return self.app(environ, start_response)
+
     if os.environ["ALLOW_IFRAME"] == "True":
       # to allow iframe embedding. https://github.com/apache/incubator-superset/issues/8382
       SESSION_COOKIE_SAMESITE = None
@@ -22,7 +40,7 @@ data:
       HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
 
       # prevent redirect from https to http
-      SUPERSET_WEBSERVER_PROTOCOL = "https"
+      ADDITIONAL_MIDDLEWARE = [ReverseProxied, ]
 ---
 apiVersion: apps/v1
 kind: Deployment
