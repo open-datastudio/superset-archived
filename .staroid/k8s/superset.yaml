@@ -4,7 +4,40 @@ metadata:
   name: superset-config
 data:
   superset_config.py: |
+    import os
+
     SQLALCHEMY_DATABASE_URI = 'postgresql://superset:superset@db/superset'
+
+    if os.environ["ALLOW_IFRAME"] == "True":
+      # to allow iframe embedding. https://github.com/apache/incubator-superset/issues/8382
+      SESSION_COOKIE_SAMESITE = 'None'
+      SESSION_COOKIE_SECURE = True
+      SESSION_COOKIE_HTTPONLY = False
+
+      # Use all X-Forwarded headers when ENABLE_PROXY_FIX is True.
+      ENABLE_PROXY_FIX = True
+
+      # CSRF
+      WTF_CSRF_ENABLED = False
+
+      HTTP_HEADERS = {'X-Frame-Options': 'ALLOWALL'}
+
+    # https://github.com/komoot/superset-reverse-nginx-example/blob/master/superset_config.py
+    class ReverseProxied(object):
+      """
+      Because we are reverse proxied from an aws load balancer
+      use environ/config to signal https
+      since flask ignores preferred_url_scheme in url_for calls
+      """
+      def __init__(self, app):
+        self.app = app
+
+      def __call__(self, environ, start_response):
+        environ["wsgi.url_scheme"] = "https"
+        return self.app(environ, start_response)
+
+    # prevent redirect from https to http
+    ADDITIONAL_MIDDLEWARE = [ReverseProxied, ]
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42,6 +75,8 @@ spec:
         env:
         - name: SUPERSET_CONFIG_PATH
           value: /superset-config/superset_config.py
+        - name: ALLOW_IFRAME
+          value: "False"
         volumeMounts:
         - name: config-volume
           mountPath: /superset-config
@@ -61,6 +96,8 @@ spec:
         env:
         - name: SUPERSET_CONFIG_PATH
           value: /superset-config/superset_config.py
+        - name: ALLOW_IFRAME
+          value: "False"
         volumeMounts:
         - name: config-volume
           mountPath: /superset-config
